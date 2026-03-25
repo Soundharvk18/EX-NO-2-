@@ -1,6 +1,8 @@
 ## EX. NO:2 IMPLEMENTATION OF PLAYFAIR CIPHER
 
- 
+ ## NAME: Jeya soundhar P
+ ## REG.NO: 212224040138
+ ## DATE: 28-01-2026
 
 ## AIM:
  
@@ -34,10 +36,144 @@ STEP-5: Display the obtained cipher text.
 
 
 
-Program:
+## Program:
+```
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define SIZE 100
+
+void toLowerCase(char str[]) {
+    for (int i = 0; str[i]; i++)
+        if (str[i] >= 'A' && str[i] <= 'Z')
+            str[i] += 32;
+}
+
+int removeSpaces(char str[]) {
+    int count = 0;
+    for (int i = 0; str[i]; i++)
+        if (str[i] != ' ')
+            str[count++] = str[i];
+    str[count] = '\0';
+    return count;
+}
+
+int preparePlainText(char str[]) {
+    int len = strlen(str);
+    for (int i = 0; i < len; i++)
+        if (str[i] == 'j') str[i] = 'i';
+    if (len % 2 != 0) {
+        str[len++] = 'z';
+        str[len] = '\0';
+    }
+    return len;
+}
+
+void createKeyMatrix(char key[], char matrix[5][5]) {
+    int used[26] = {0};
+    used['j' - 'a'] = 1;
+    char temp[25];
+    int index = 0;
+
+    for (int i = 0; key[i]; i++) {
+        if (!used[key[i] - 'a']) {
+            temp[index++] = key[i];
+            used[key[i] - 'a'] = 1;
+        }
+    }
+
+    for (int i = 0; i < 26; i++)
+        if (!used[i])
+            temp[index++] = i + 'a';
+
+    index = 0;
+    for (int i = 0; i < 5; i++)
+        for (int j = 0; j < 5; j++)
+            matrix[i][j] = temp[index++];
+}
+
+void searchMatrix(char matrix[5][5], char a, char b, int pos[4]) {
+    for (int i = 0; i < 5; i++)
+        for (int j = 0; j < 5; j++) {
+            if (matrix[i][j] == a) { pos[0] = i; pos[1] = j; }
+            if (matrix[i][j] == b) { pos[2] = i; pos[3] = j; }
+        }
+}
+
+void encryptPlayfair(char str[], char matrix[5][5], int len) {
+    int pos[4];
+    for (int i = 0; i < len; i += 2) {
+        searchMatrix(matrix, str[i], str[i + 1], pos);
+
+        if (pos[0] == pos[2]) {
+            str[i] = matrix[pos[0]][(pos[1] + 1) % 5];
+            str[i + 1] = matrix[pos[0]][(pos[3] + 1) % 5];
+        } else if (pos[1] == pos[3]) {
+            str[i] = matrix[(pos[0] + 1) % 5][pos[1]];
+            str[i + 1] = matrix[(pos[2] + 1) % 5][pos[1]];
+        } else {
+            str[i] = matrix[pos[0]][pos[3]];
+            str[i + 1] = matrix[pos[2]][pos[1]];
+        }
+    }
+}
+
+void decryptPlayfair(char str[], char matrix[5][5], int len) {
+    int pos[4];
+    for (int i = 0; i < len; i += 2) {
+        searchMatrix(matrix, str[i], str[i + 1], pos);
+
+        if (pos[0] == pos[2]) {
+            str[i] = matrix[pos[0]][(pos[1] + 4) % 5];
+            str[i + 1] = matrix[pos[0]][(pos[3] + 4) % 5];
+        } else if (pos[1] == pos[3]) {
+            str[i] = matrix[(pos[0] + 4) % 5][pos[1]];
+            str[i + 1] = matrix[(pos[2] + 4) % 5][pos[1]];
+        } else {
+            str[i] = matrix[pos[0]][pos[3]];
+            str[i + 1] = matrix[pos[2]][pos[1]];
+        }
+    }
+}
+
+int main() {
+    char plaintext[SIZE], key[SIZE], matrix[5][5], cipher[SIZE];
+
+    printf("Enter the plain text: ");
+    fgets(plaintext, SIZE, stdin);
+    plaintext[strcspn(plaintext, "\n")] = '\0';
+
+    printf("Enter the keyword: ");
+    fgets(key, SIZE, stdin);
+    key[strcspn(key, "\n")] = '\0';
+
+    toLowerCase(plaintext);
+    toLowerCase(key);
+    removeSpaces(plaintext);
+    removeSpaces(key);
+
+    createKeyMatrix(key, matrix);
+
+    int len = preparePlainText(plaintext);
+
+    strcpy(cipher, plaintext);
+    encryptPlayfair(cipher, matrix, len);
+    printf("Cipher Text: %s\n", cipher);
+
+    decryptPlayfair(cipher, matrix, len);
+    printf("Decrypted Text: %s\n", cipher);
+
+    return 0;
+}
+```
 
 
 
 
 
-Output:
+## Output:
+![WhatsApp Image 2026-01-28 at 2 27 16 PM](https://github.com/user-attachments/assets/a7e24d6c-dc49-4db3-b728-3b7c98d8e030)
+
+
